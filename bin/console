@@ -2,6 +2,7 @@
 <?php
 
 use App\ClassAuthorStatisticCommand;
+use App\ClassInfoCommand;
 use Symfony\Component\Console\Application;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -13,6 +14,12 @@ $analyzer = new \App\Author\ClassAuthorAnalyzer(
         'App'
 );
 $application->add(new ClassAuthorStatisticCommand($analyzer));
+
+$analyzer_class_info = new \App\ClassInfo\ClassInfoAnalyzer(
+    __DIR__ . '/../src',
+    'App'
+);
+$application->add(new ClassInfoCommand($analyzer_class_info));
 
 $exitCode = $application->run();
 exit($exitCode);
