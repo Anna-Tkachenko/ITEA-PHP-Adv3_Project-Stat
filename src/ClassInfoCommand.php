@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * (types and amount of properties and methods).
  *
  * Example of usage
- * ./bin/console stat:class-info ClassStatisticCommand
+ * ./bin/console stat:class-info Author/ClassAuthorAnalyzer
  *
  * @author Anna Tkachenko <tkachenko.anna835@gmail.com>
  */
