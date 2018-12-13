@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * (types and amount of properties and methods).
  *
  * Example of usage
- * ./bin/console stat:class-info Author/ClassAuthorAnalyzer
+ * ./bin/console stat:class-info App/Author/ClassAuthorAnalyzer
  *
  * @author Anna Tkachenko <tkachenko.anna835@gmail.com>
  */
@@ -60,39 +60,35 @@ final class ClassInfoCommand extends Command
     {
         $name = $input->getArgument('class-name');
 
-        $class_info = $this->analyzer->analyze($name);
+        $classInfoStorage = $this->analyzer->analyze($name);
 
-        if (!($class_info == null)) {
-            $output->writeln(
-                \sprintf(
-                    'Class: %s' . \PHP_EOL .
-                    'Properties: ' . \PHP_EOL . 'public: %d (%d static)' . \PHP_EOL .
-                    'protected: %d (%d static)' . \PHP_EOL .
-                    'private: %d (%d static)' . \PHP_EOL .
 
-                    'Methods: ' . \PHP_EOL . 'public: %d (%d static)' . \PHP_EOL .
-                    'protected: %d (%d static)' . \PHP_EOL .
-                    'private: %d (%d static)'
+        $output->writeln(
+            \sprintf(
+                'Class: %s' . \PHP_EOL .
+                'Properties: ' . \PHP_EOL . 'public: %d (%d static)' . \PHP_EOL .
+                'protected: %d (%d static)' . \PHP_EOL .
+                'private: %d (%d static)' . \PHP_EOL .
 
-                    ,$class_info['class-type'],
-                    $class_info['public_prop'],
-                    $class_info['public_static_prop'],
-                    $class_info['protected_prop'],
-                    $class_info['protected_static_prop'],
-                    $class_info['private_prop'],
-                    $class_info['private_static_prop'],
-                    $class_info['public_methods'],
-                    $class_info['public_static_methods'],
-                    $class_info['protected_methods'],
-                    $class_info['protected_static_methods'],
-                    $class_info['private_methods'],
-                    $class_info['private_static_methods']
-                )
-            );
-        } else {
-            $output->writeln(
-                \sprintf('Undefined class name.')
-            );
-        }
+                'Methods: ' . \PHP_EOL . 'public: %d (%d static)' . \PHP_EOL .
+                'protected: %d (%d static)' . \PHP_EOL .
+                'private: %d (%d static)'
+
+                ,$classInfoStorage->get('classType'),
+                $classInfoStorage->get('publicProp'),
+                $classInfoStorage->get('publicStaticProp'),
+                $classInfoStorage->get('protectedProp'),
+                $classInfoStorage->get('protectedStaticProp'),
+                $classInfoStorage->get('privateProp'),
+                $classInfoStorage->get('privateStaticProp'),
+                $classInfoStorage->get('publicMethods'),
+                $classInfoStorage->get('publicStaticMethods'),
+                $classInfoStorage->get('protectedMethods'),
+                $classInfoStorage->get('protectedStaticMethods'),
+                $classInfoStorage->get('privateMethods'),
+                $classInfoStorage->get('privateStaticMethods')
+            )
+        );
     }
+
 }
