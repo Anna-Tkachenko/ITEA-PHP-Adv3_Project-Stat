@@ -8,8 +8,6 @@
 
 namespace App\ClassInfo;
 
-use Symfony\Component\Finder\Finder;
-
 /**
  * Analyzer that provides information about classes properties and methods.
  *
@@ -37,48 +35,122 @@ final class ClassInfoAnalyzer
         try {
             $reflection = new \ReflectionClass($fullClassName);
         } catch (\ReflectionException $e) {
+            throw new \LogicException(
+                \sprintf("Invalid class name '%s' ", $name)
+            );
         }
 
+        $this->analyzeClassType($reflection);
+        $this->analyzeClassProps($reflection);
+        $this->analyzeClassMethods($reflection);
+
+        return $this->classInfoStorage;
+    }
+
+    private function analyzeClassType(\ReflectionClass $reflection)
+    {
         if ($reflection->isAbstract()) {
-            $this->classInfoStorage->set('classType', 'Abstract');
+            $this->classInfoStorage->set('classType', 1);
         } elseif ($reflection->isFinal()) {
-            $this->classInfoStorage->set('classType', 'Final');
+            $this->classInfoStorage->set('classType', 2);
         } else {
-            $this->classInfoStorage->set('classType', 'Sample');;
+            $this->classInfoStorage->set('classType', 3);;
         }
+    }
 
-        $this->classInfoStorage->set('publicProp', count($reflection->getProperties(\ReflectionProperty::IS_PUBLIC)));
-        $this->classInfoStorage->set('protectedProp', count($reflection->getProperties(\ReflectionProperty::IS_PROTECTED)));
-        $this->classInfoStorage->set('privateProp', count($reflection->getProperties(\ReflectionProperty::IS_PRIVATE)));
+    private function analyzeClassProps(\ReflectionClass $reflection)
+    {
+        $this->analyzePublicProps($reflection);
+        $this->analyzeProtectedProps($reflection);
+        $this->analyzePrivateProps($reflection);
+        $this->analyzeStaticProps($reflection);
+    }
 
-        $static_properties = $reflection->getProperties(\ReflectionProperty::IS_STATIC);
+    private function analyzeClassMethods(\ReflectionClass $reflection)
+    {
+        $this->analyzePublicMethods($reflection);
+        $this->analyzeProtectedMethods($reflection);
+        $this->analyzePrivateMethods($reflection);
+        $this->analyzeStaticMethods($reflection);
+    }
 
-        foreach ($static_properties as $static_property) {
-            if ($static_property->isPublic()) {
-                $this->classInfoStorage->setStaticProp('publicStaticProp');
-            } elseif ($static_property->isProtected()) {
-                $this->classInfoStorage->setStaticProp('protectedStaticProp');
-            } elseif ($static_property->isPrivate()) {
-                $this->classInfoStorage->setStaticProp('privateStaticProp');
-            }
-        }
+    private function analyzePublicProps(\ReflectionClass $reflection){
+        $num = count($reflection->getProperties(\ReflectionProperty::IS_PUBLIC));
+        $this->classInfoStorage->set('publicProp', $num);
+    }
 
-        $this->classInfoStorage->set('publicMethods', count($reflection->getMethods(\ReflectionMethod::IS_PUBLIC)));
-        $this->classInfoStorage->set('protectedMethods', count($reflection->getMethods(\ReflectionMethod::IS_PROTECTED)));
-        $this->classInfoStorage->set('privateMethods', count($reflection->getMethods(\ReflectionMethod::IS_PRIVATE)));
+    private function analyzeProtectedProps(\ReflectionClass $reflection){
+        $num = count($reflection->getProperties(\ReflectionProperty::IS_PROTECTED));
+        $this->classInfoStorage->set('protectedProp', $num);
+    }
 
-        $static_methods = $reflection->getMethods(\ReflectionMethod::IS_STATIC);
+    private function analyzePrivateProps(\ReflectionClass $reflection){
+        $num = count($reflection->getProperties(\ReflectionProperty::IS_PRIVATE));
+        $this->classInfoStorage->set('privateProp', $num);
+    }
 
-        foreach ($static_methods as $static_method) {
-            if ($static_method->isPublic()) {
-                $this->classInfoStorage->setStaticProp('publicStaticMethods');
-            } elseif ($static_method->isProtected()) {
-                $this->classInfoStorage->setStaticProp('protectedStaticMethods');
-            } elseif ($static_method->isPrivate()) {
-                $this->classInfoStorage->setStaticProp('privateStaticMethods');
-            }
-        }
+    private function analyzeStaticProps(\ReflectionClass $reflection)
+    {
+        $this->analyzePublicStaticProps($reflection);
+        $this->analyzeProtectedStaticProps($reflection);
+        $this->analyzePrivateStaticProps($reflection);
+    }
 
-       return $this->classInfoStorage;
+    private function analyzePublicStaticProps(\ReflectionClass $reflection)
+    {
+        $num = count($reflection->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_STATIC));
+        $this->classInfoStorage->set('publicStaticProp', $num);
+    }
+
+    private function analyzeProtectedStaticProps(\ReflectionClass $reflection)
+    {
+        $num = count($reflection->getProperties(\ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_STATIC));
+        $this->classInfoStorage->set('protectedStaticProp', $num);
+    }
+
+    private function analyzePrivateStaticProps(\ReflectionClass $reflection)
+    {
+        $num = count($reflection->getProperties(\ReflectionProperty::IS_PRIVATE | \ReflectionProperty::IS_STATIC));
+        $this->classInfoStorage->set('privateStaticProp', $num);
+    }
+
+    private function analyzePublicMethods(\ReflectionClass $reflection){
+        $num = count($reflection->getMethods(\ReflectionMethod::IS_PUBLIC));
+        $this->classInfoStorage->set('publicMethods', $num);
+    }
+
+    private function analyzeProtectedMethods(\ReflectionClass $reflection){
+        $num = count($reflection->getMethods(\ReflectionMethod::IS_PROTECTED));
+        $this->classInfoStorage->set('protectedMethods', $num);
+    }
+
+    private function analyzePrivateMethods(\ReflectionClass $reflection){
+        $num = count($reflection->getMethods(\ReflectionMethod::IS_PRIVATE));
+        $this->classInfoStorage->set('privateMethods', $num);
+    }
+
+    private function analyzeStaticMethods(\ReflectionClass $reflection)
+    {
+        $this->analyzePublicStaticMethods($reflection);
+        $this->analyzeProtectedStaticMethods($reflection);
+        $this->analyzePrivateStaticMethods($reflection);
+    }
+
+    private function analyzePublicStaticMethods(\ReflectionClass $reflection)
+    {
+        $num = count($reflection->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_STATIC));
+        $this->classInfoStorage->set('publicStaticMethods', $num);
+    }
+
+    private function analyzeProtectedStaticMethods(\ReflectionClass $reflection)
+    {
+        $num = count($reflection->getMethods(\ReflectionMethod::IS_PROTECTED | \ReflectionMethod::IS_STATIC));
+        $this->classInfoStorage->set('protectedStaticMethods', $num);
+    }
+
+    private function analyzePrivateStaticMethods(\ReflectionClass $reflection)
+    {
+        $num = count($reflection->getMethods(\ReflectionMethod::IS_PRIVATE | \ReflectionMethod::IS_STATIC));
+        $this->classInfoStorage->set('privateStaticMethods', $num);
     }
 }

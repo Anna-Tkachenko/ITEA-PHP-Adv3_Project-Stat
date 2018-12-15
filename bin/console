@@ -3,7 +3,7 @@
 
 use App\ClassAuthorStatisticCommand;
 use App\ClassInfoCommand;
-use App\ClassInfo\ClassInfoStorage;
+use App\ClassInfo\ClassInfoModel;
 use Symfony\Component\Console\Application;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -16,7 +16,7 @@ $analyzer = new \App\Author\ClassAuthorAnalyzer(
 );
 $application->add(new ClassAuthorStatisticCommand($analyzer));
 
-$classInfoStorage = new ClassInfoStorage();
+$classInfoStorage = new ClassInfoModel();
 $analyzerClassInfo = new \App\ClassInfo\ClassInfoAnalyzer($classInfoStorage);
 $application->add(new ClassInfoCommand($analyzerClassInfo));
 
