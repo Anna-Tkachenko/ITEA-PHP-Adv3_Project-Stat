@@ -8,7 +8,6 @@
 
 namespace App\ClassInfo;
 
-
 class ClassInfoModel
 {
     public CONST IS_ABSTRACT  = 1;

@@ -62,33 +62,51 @@ final class ClassInfoCommand extends Command
 
         $classInfoStorage = $this->analyzer->analyze($name);
 
+        $content = '';
 
-        $output->writeln(
-            \sprintf(
-                'Class: %s' . \PHP_EOL .
-                'Properties: ' . \PHP_EOL . 'public: %d (%d static)' . \PHP_EOL .
-                'protected: %d (%d static)' . \PHP_EOL .
-                'private: %d (%d static)' . \PHP_EOL .
+        $content .= 'Class: ';
+        $classType = $classInfoStorage->getClassType();
+        switch (true) {
+            case $classType === $classInfoStorage::IS_ABSTRACT:
+                $content .= "abstract\n";
+                break;
+            case $classType === $classInfoStorage::IS_FINAL:
+                $content .= "final\n";
+                break;
+            default:
+                $content .= "sample\n";
+                break;
+        }
 
-                'Methods: ' . \PHP_EOL . 'public: %d (%d static)' . \PHP_EOL .
-                'protected: %d (%d static)' . \PHP_EOL .
-                'private: %d (%d static)'
+        $content .= "Properties: \n";
+        $content .= "\tpublic: " . $classInfoStorage->getPublicProp();
+        if($classInfoStorage->getPublicStaticProp()){
+            $content .= "(static: " . $classInfoStorage->getPublicStaticProp() . ")";
+        }
+        $content .= "\n\tprotected: " . $classInfoStorage->getProtectedProp();
+        if($classInfoStorage->getProtectedStaticProp()){
+            $content .= "(static: " . $classInfoStorage->getProtectedStaticProp() . ")";
+        }
+        $content .= "\n\tprivate: " . $classInfoStorage->getPrivateProp();
+        if($classInfoStorage->getPublicStaticProp()){
+            $content .= "(static: " . $classInfoStorage->getPrivateStaticProp() . ")";
+        }
 
-                ,$classInfoStorage->get('classType'),
-                $classInfoStorage->get('publicProp'),
-                $classInfoStorage->get('publicStaticProp'),
-                $classInfoStorage->get('protectedProp'),
-                $classInfoStorage->get('protectedStaticProp'),
-                $classInfoStorage->get('privateProp'),
-                $classInfoStorage->get('privateStaticProp'),
-                $classInfoStorage->get('publicMethods'),
-                $classInfoStorage->get('publicStaticMethods'),
-                $classInfoStorage->get('protectedMethods'),
-                $classInfoStorage->get('protectedStaticMethods'),
-                $classInfoStorage->get('privateMethods'),
-                $classInfoStorage->get('privateStaticMethods')
-            )
-        );
+        $content .= "\nMethods: \n";
+        $content .= "\tpublic: " . $classInfoStorage->getPublicMethods();
+        if($classInfoStorage->getPublicStaticMethods()){
+            $content .= "(static: " . $classInfoStorage->getPublicStaticMethods() . ")";
+        }
+        $content .= "\n\tprotected: " . $classInfoStorage->getProtectedMethods();
+        if($classInfoStorage->getProtectedStaticMethods()){
+            $content .= "(static: " . $classInfoStorage->getProtectedStaticMethods() . ")";
+        }
+        $content .= "\n\tprivate: " . $classInfoStorage->getPrivateMethods();
+        if($classInfoStorage->getPublicStaticMethods()){
+            $content .= "(static: " . $classInfoStorage->getPrivateStaticMethods() . ")";
+        }
+
+        $output->writeln($content);
     }
 
 }
